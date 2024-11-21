@@ -1,0 +1,91 @@
+
+/* Reset styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Body Styling */
+body {
+    background: linear-gradient(135deg, #f7a8b8, #00f5d4); /* TikTok gradient colors */
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Main Container Styling */
+#main-tool {
+    width: 100%;
+    max-width: 450px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Logo Styling */
+.wrapper img {
+    max-width: 150px; /* Set appropriate logo size */
+}
+
+/* Header Styling */
+#TFG {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #f9f9f9;
+    font-weight: bold;
+}
+
+/* Input Fields Styling */
+.input-form {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #f3f3f3;
+    color: #333;
+}
+
+/* Button Styling */
+.buttonstyle {
+    background-color: #fe2c55;
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.buttonstyle:hover {
+    background-color: #d81e3c;
+}
+
+/* Responsive Styling */
+@media (max-width: 760px) {
+    #TFG {
+        font-size: 2rem;
+    }
+
+    .input-form {
+        font-size: 1rem;
+    }
+
+    .buttonstyle {
+        font-size: 1rem;
+    }
+}
